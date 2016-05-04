@@ -30,8 +30,8 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 
 	protected virtual void Awake(){
 		route = new int[2][];
-		route[0] = new int[] {2,2,2};
-		route[1] = new int[] {5,1,1};
+		route[0] = new int[] {200,200,75};
+		route[1] = new int[] {500,100,35};
 		body2d = GetComponent<Rigidbody2D>();
 		//collisionState = GetComponent<CollisionState> ();
 		player = FindObjectOfType <PlayerManager>();
@@ -51,6 +51,10 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 		playerVector3 = new Vector3 (player.transform.position.x, player.transform.position.y, player.transform.position.z);
 		distanceToPlayer = (Mathf.Sqrt (Mathf.Pow ((transform.position.x - playerVector3.x), 2) + Mathf.Pow ((transform.position.y - playerVector3.y), 2)));
 		MoveRoute();
+
+
+		var xCoor = playerVector3.x - transform.position.x;
+		var yCoor = playerVector3.y - transform.position.y;
 	}
 
 

@@ -6,13 +6,11 @@ public class RangedAttacks : FireGenericProjectile {
 	public GameObject prefab;
 
 
-	// Use this for initialization
-	void Start () {
-	
-	}
+
 	
 	// Update is called once per frame
 	void Update () {
+		base.Update ();
 		Attack1 ();
 	}
 
