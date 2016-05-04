@@ -22,8 +22,16 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 	protected float yAxisDirection;
 	protected float xAxisDirection;
 
+	public int mrp = 0;
+	public bool move = true;
+	public int[][] route;
+
+
 
 	protected virtual void Awake(){
+		route = new int[2][];
+		route[0] = new int[] {2,2,2};
+		route[1] = new int[] {5,1,1};
 		body2d = GetComponent<Rigidbody2D>();
 		//collisionState = GetComponent<CollisionState> ();
 		player = FindObjectOfType <PlayerManager>();
@@ -42,22 +50,7 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 		DetectPlayer ();
 		playerVector3 = new Vector3 (player.transform.position.x, player.transform.position.y, player.transform.position.z);
 		distanceToPlayer = (Mathf.Sqrt (Mathf.Pow ((transform.position.x - playerVector3.x), 2) + Mathf.Pow ((transform.position.y - playerVector3.y), 2)));
-		if (playerVector3.x > transform.position.x)
-			playerRight = true;
-		else
-			playerRight = false;
-		if (playerVector3.y > transform.position.y)
-			playerAbove = true;
-		else
-			playerAbove = false;
-		if (playerRight)
-			xAxisDirection = 1;
-		else
-			xAxisDirection = -1;
-		if (playerAbove)
-			yAxisDirection = 1;
-		else
-			yAxisDirection = -1;
+		MoveRoute();
 	}
 
 
@@ -100,4 +93,21 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 		Vector2 TravelVector = new Vector2 (speed * XMult, speed * YMult);
 		return TravelVector;
 	}
+		
+
+	public virtual void MoveRoute () {
+		if (!move || route == null) {return;} 
+		body2d.velocity = MoveTowardsTarget (new Vector3 (route[mrp][0], route[mrp][1], 0), route[mrp][2]);
+		if (Mathf.Round(transform.position.x) == route[mrp][0] && Mathf.Round(transform.position.y) == route[mrp][1]) {
+			mrp++;
+			Debug.Log (mrp);
+		}
+		if (mrp == route.Length) {
+			mrp = 0;
+			route = null;
+			body2d.velocity = new Vector2 (0, 0);
+//			GetNewRoute
+		}
+	}
+
 }
