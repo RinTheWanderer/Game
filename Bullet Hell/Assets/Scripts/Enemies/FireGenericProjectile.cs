@@ -7,7 +7,6 @@ public abstract class FireGenericProjectile : AbstractEnemyBehavior {
 	protected float yOffset;
 	private Rigidbody2D prefabRigidBody;
 
-	protected float projectileSpeed;
 	private Vector3 adjustedTargetLoc = new Vector3 (0,0,0);
 
 
@@ -25,7 +24,7 @@ public abstract class FireGenericProjectile : AbstractEnemyBehavior {
 	}
 
 
-	protected virtual void ShootProjectile (GameObject prefab, Vector2 pos, Vector3 target, bool towardsPlayer, bool homing, float xSpeed, float ySpeed, float damage){
+	protected virtual void ShootProjectile (float damage, float projectileSpeed, GameObject prefab, Vector2 pos, Vector3 target, bool towardsPlayer = false, bool homing = false, float xSpeed = 0, float ySpeed = 0){
 		Vector3 targetPosition = target;
 		var clone = Instantiate (prefab, pos, Quaternion.identity) as GameObject;
 

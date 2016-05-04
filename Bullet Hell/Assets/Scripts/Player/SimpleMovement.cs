@@ -9,14 +9,16 @@ public class SimpleMovement : MonoBehaviour {
 
 	private Rigidbody2D body2d;
 
-	public bool canDash = true;
+	private bool canDash = true;
 	public float dashWaitTime;
 	public float dashTime;
 	private float dashCounter;
-	public float dashSpeed;
+	public float dashMultiplier;
+	private bool dashing = false;
+	private Vector2 dashVector= new Vector2 (0,0);
 
 
-	void Start ()
+	void Awake ()
 	{
 		body2d = GetComponent<Rigidbody2D> ();
 	}
@@ -25,31 +27,23 @@ public class SimpleMovement : MonoBehaviour {
 	void Update () 
 	{
 		if (canDash) {
-			if (Input.GetKey (KeyCode.LeftShift))
-				body2d.velocity = new Vector2 (shiftMultiplier * speed * Input.GetAxis ("Horizontal"), shiftMultiplier * speed * Input.GetAxis ("Vertical"));
-			else if (Input.GetKey (KeyCode.Space))
-				Dash ();
-			else
-				body2d.velocity = new Vector2 (speed * Input.GetAxis ("Horizontal"), speed * Input.GetAxis ("Vertical"));
-		}
-	}
-
-	public void Dash(){
-		canDash = false;
-		float currentXVelocity = body2d.velocity.x;
-		float currentYVelocity = body2d.velocity.y;
-
-		if (dashCounter <= dashTime) {
-			body2d.velocity = new Vector2 (currentXVelocity * dashSpeed, currentYVelocity * dashSpeed);
-			dashCounter += Time.deltaTime;
+			if (Input.GetKey (KeyCode.Space)) {
+				dashVector = new Vector2 (body2d.velocity.x * dashMultiplier, body2d.velocity.y * dashMultiplier);
+				dashCounter = 0;
+				canDash = false;
+			}
 		} 
-		else if (dashCounter > dashTime && dashCounter <= dashWaitTime) {
-			body2d.velocity = new Vector2 (0, 0);
-			dashCounter += Time.deltaTime;
-		}
 		else {
-			dashCounter = 0;
-			canDash = true;
+			dashCounter += Time.deltaTime;
+			if (dashCounter > dashTime)
+				dashVector = new Vector2 (0, 0);
+			if(dashCounter > dashWaitTime)
+				canDash = true;
 		}
+
+		if (Input.GetKey (KeyCode.LeftShift))
+			body2d.velocity = new Vector2 (shiftMultiplier * speed * Input.GetAxis ("Horizontal"), shiftMultiplier * speed * Input.GetAxis ("Vertical"));
+		else
+			body2d.velocity = dashVector + new Vector2 (speed * Input.GetAxis ("Horizontal"), speed * Input.GetAxis ("Vertical"));
 	}
 }
