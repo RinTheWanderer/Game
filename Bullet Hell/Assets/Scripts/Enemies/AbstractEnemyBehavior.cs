@@ -4,6 +4,7 @@ using System.Collections;
 public abstract class AbstractEnemyBehavior : MonoBehaviour {
 
 	public MonoBehaviour[] disableScripts;
+	public object[] test = new object[] {new Vector3 (0,1,0), 5, "hello"};
 
 	protected Rigidbody2D body2d;
 	//protected CollisionState collisionState;
@@ -24,14 +25,16 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 
 	public int mrp = 0;
 	public bool move = true;
-	public int[][] route;
+	public float[][] route;
+	protected Vector3 moveStartPos;
+	protected Vector3 playerMoveStartPos;
 
 
 
 	protected virtual void Awake(){
-		route = new int[2][];
-		route[0] = new int[] {200,200,75};
-		route[1] = new int[] {500,100,35};
+		route = new float[2][];
+		route[0] = new float[] {200,200,75};
+		route[1] = new float[] {500,100,35};
 		body2d = GetComponent<Rigidbody2D>();
 		//collisionState = GetComponent<CollisionState> ();
 		player = FindObjectOfType <PlayerManager>();
@@ -48,8 +51,8 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 
 	public virtual void Update(){
 		DetectPlayer ();
+		distanceToPlayer = (transform.position - player.transform.position).magnitude;
 		playerVector3 = new Vector3 (player.transform.position.x, player.transform.position.y, player.transform.position.z);
-		distanceToPlayer = (Mathf.Sqrt (Mathf.Pow ((transform.position.x - playerVector3.x), 2) + Mathf.Pow ((transform.position.y - playerVector3.y), 2)));
 		MoveRoute();
 
 
@@ -95,12 +98,20 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 		var XMult = -(transform.position.x - targetPosX) / (Mathf.Sqrt (Mathf.Pow ((transform.position.x - target.x), 2) + Mathf.Pow ((transform.position.y - target.y), 2)));
 		var YMult = -(transform.position.y - targetPosY) / (Mathf.Sqrt (Mathf.Pow ((transform.position.x - target.x), 2) + Mathf.Pow ((transform.position.y - target.y), 2)));
 		Vector2 TravelVector = new Vector2 (speed * XMult, speed * YMult);
+//		Debug.Log ((player.transform.position - transform.position) * (speed / distanceToPlayer));
 		return TravelVector;
 	}
 		
-
+	//Tags: 3: 0 = local, 1 = absolute; 4: 0 = ignore player, 1 = towards player start, 2 track player; 5: x offset; 6: y offset; 7: tracking strength   
 	public virtual void MoveRoute () {
-		if (!move || route == null) {return;} 
+		if (!move || route == null) {return;}
+		
+		
+		moveStartPos = transform.position;
+		playerMoveStartPos = player.transform.position;
+//		Debug.Log (moveStartPos);
+//		Debug.Log (playerMoveStartPos);
+//		Debug.Log (moveStartPos - playerMoveStartPos);
 		body2d.velocity = MoveTowardsTarget (new Vector3 (route[mrp][0], route[mrp][1], 0), route[mrp][2]);
 		if (Mathf.Round(transform.position.x) == route[mrp][0] && Mathf.Round(transform.position.y) == route[mrp][1]) {
 			mrp++;
@@ -109,8 +120,9 @@ public abstract class AbstractEnemyBehavior : MonoBehaviour {
 		if (mrp == route.Length) {
 			mrp = 0;
 			route = null;
-			body2d.velocity = new Vector2 (0, 0);
+			body2d.velocity = new Vector2 (100, 100);
 //			GetNewRoute
+
 		}
 	}
 
